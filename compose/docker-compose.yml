@@ -1,0 +1,40 @@
+version:  '3.2'
+
+services:
+
+    db-01:
+        image: "cassandra"
+        networks:
+          - cassandranet
+        environment:
+          broadcast_address: db-01
+          seeds: db-01,db-02,db-03
+          JVM_OPTS: -Xms1G -Xmx1G
+        volumes:
+          - /home/otaviojava/Environment/nosql/db1:/var/lib/cassandra
+
+    db-02:
+        image: "cassandra"
+        networks:
+          - cassandranet
+        environment:
+          broadcast_address: db-02
+          seeds: db-01,db-02,db-03
+          JVM_OPTS: -Xms1G -Xmx1G
+        volumes:
+          - /home/otaviojava/Environment/nosql/db2:/var/lib/cassandra
+
+    db-03:
+        image: "cassandra"
+        networks:
+          - cassandranet
+        environment:
+          broadcast_address: db-03
+          seeds: db-01,db-02,db-03
+          JVM_OPTS: -Xms1G -Xmx1G
+        volumes:
+          - /home/otaviojava/Environment/nosql/db3:/var/lib/cassandra
+
+networks:
+    cassandranet:
+
