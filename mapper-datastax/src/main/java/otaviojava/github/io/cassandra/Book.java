@@ -1,27 +1,23 @@
 package otaviojava.github.io.cassandra;
 
 
-import com.datastax.driver.mapping.annotations.Column;
-import com.datastax.driver.mapping.annotations.PartitionKey;
-import com.datastax.driver.mapping.annotations.Table;
+
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
+import com.datastax.oss.driver.api.mapper.annotations.PartitionKey;
 
 import java.util.Objects;
 import java.util.Set;
 
-@Table(name = "book", keyspace = "library")
+@Entity
 public class Book {
 
     @PartitionKey
-    @Column
     private Long isbn;
 
-    @Column
     private String name;
 
-    @Column
     private String author;
 
-    @Column
     private Set<String> categories;
 
     public Long getIsbn() {
