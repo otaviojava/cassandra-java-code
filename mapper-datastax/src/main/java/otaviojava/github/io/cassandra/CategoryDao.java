@@ -1,27 +1,24 @@
 package otaviojava.github.io.cassandra;
 
 import com.datastax.oss.driver.api.core.PagingIterable;
-import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.mapper.annotations.Dao;
 import com.datastax.oss.driver.api.mapper.annotations.Delete;
 import com.datastax.oss.driver.api.mapper.annotations.Insert;
 import com.datastax.oss.driver.api.mapper.annotations.Query;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 
-import java.util.List;
-
 @Dao
-public interface BookDao {
+public interface CategoryDao {
 
     @Select
-    Book findById(Long id);
+    Category findById(String id);
 
     @Insert
-    void save(Book book);
+    void save(Category book);
 
     @Delete
-    void delete(Book book);
+    void delete(Category book);
 
-    @Query("SELECT * FROM library.book")
-    PagingIterable<Book> map();
+    @Query("SELECT * FROM library.category")
+    PagingIterable<Category> map();
 }

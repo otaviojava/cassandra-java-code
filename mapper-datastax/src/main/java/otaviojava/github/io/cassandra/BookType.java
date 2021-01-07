@@ -1,25 +1,21 @@
 package otaviojava.github.io.cassandra;
 
 
-import com.datastax.driver.mapping.annotations.Field;
-import com.datastax.driver.mapping.annotations.UDT;
+
+import com.datastax.oss.driver.api.mapper.annotations.Entity;
 
 import java.util.Objects;
 import java.util.Set;
 
-@UDT(name = "book", keyspace = "library")
+@Entity
 public class BookType {
 
-    @Field
     private Long isbn;
 
-    @Field
     private String name;
 
-    @Field
     private String author;
 
-    @Field
     private Set<String> categories;
 
     public Long getIsbn() {
