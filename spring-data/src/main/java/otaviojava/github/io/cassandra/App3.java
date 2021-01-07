@@ -1,7 +1,6 @@
 package otaviojava.github.io.cassandra;
 
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.google.common.collect.Sets;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 
@@ -22,23 +21,23 @@ public class App3 {
 
             CassandraTemplate template = ctx.getBean(CassandraTemplate.class);
 
-            BookType cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Sets.newHashSet("Java", "OO"));
-            BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Sets.newHashSet("Good practice"));
-            BookType effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Sets.newHashSet("Java", "Good practice"));
-            BookType nosqlDistilled = getBook(4L, "Nosql Distilled", "Martin Fowler", Sets.newHashSet("NoSQL", "Good practice"));
+            BookType cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO"));
+            BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));
+            BookType effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Set.of("Java", "Good practice"));
+            BookType nosqlDistilled = getBook(4L, "Nosql Distilled", "Martin Fowler", Set.of("NoSQL", "Good practice"));
 
 
-            Category java = getCategory("Java", Sets.newHashSet(cleanCode, effectiveJava));
-            Category oo = getCategory("OO", Sets.newHashSet(cleanCode, effectiveJava, cleanArchitecture));
-            Category goodPractice = getCategory("Good practice", Sets.newHashSet(cleanCode, effectiveJava, cleanArchitecture, nosqlDistilled));
-            Category nosql = getCategory("NoSQL", Sets.newHashSet(nosqlDistilled));
+            Category java = getCategory("Java", Set.of(cleanCode, effectiveJava));
+            Category oo = getCategory("OO", Set.of(cleanCode, effectiveJava, cleanArchitecture));
+            Category goodPractice = getCategory("Good practice", Set.of(cleanCode, effectiveJava, cleanArchitecture, nosqlDistilled));
+            Category nosql = getCategory("NoSQL", Set.of(nosqlDistilled));
 
             template.insert(java);
             template.insert(oo);
             template.insert(goodPractice);
             template.insert(nosql);
 
-            List<Category> categories = template.select(QueryBuilder.select().from(KEYSPACE, COLUMN_FAMILY), Category.class);
+            List<Category> categories = template.select(QueryBuilder.selectFrom(KEYSPACE, COLUMN_FAMILY).all().build(), Category.class);
             System.out.println(categories);
         }
 

@@ -13,7 +13,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <org.springframework.data.version>2.2.4.RELEASE</org.springframework.data.version>
+        <org.springframework.data.version>3.1.2</org.springframework.data.version>
     </properties>
     <build>
         <plugins>
@@ -21,8 +21,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,6 +1,5 @@
 package otaviojava.github.io.cassandra;
 
-import com.google.common.collect.Sets;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.data.cassandra.core.CassandraTemplate;
 
@@ -18,10 +17,10 @@ public class App2 {
 
             CassandraTemplate template = ctx.getBean(CassandraTemplate.class);
 
-            Book cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Sets.newHashSet("Java", "OO"));
-            Book cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Sets.newHashSet("Good practice"));
-            Book effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Sets.newHashSet("Java", "Good practice"));
-            Book nosql = getBook(4L, "Nosql Distilled", "Martin Fowler", Sets.newHashSet("NoSQL", "Good practice"));
+            Book cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO"));
+            Book cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));
+            Book effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Set.of("Java", "Good practice"));
+            Book nosql = getBook(4L, "Nosql Distilled", "Martin Fowler", Set.of("NoSQL", "Good practice"));
 
             template.insert(cleanCode);
             template.insert(cleanArchitecture);
