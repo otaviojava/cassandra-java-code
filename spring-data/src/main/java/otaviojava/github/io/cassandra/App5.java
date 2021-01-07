@@ -13,7 +13,7 @@ public class App5 {
 
     public static void main(String[] args) {
 
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(Config.class)) {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CassandraConfig.class)) {
 
             BookRepository repository = ctx.getBean(BookRepository.class);
             Book cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO"));
@@ -31,11 +31,8 @@ public class App5 {
 
             Optional<Book> book = repository.findById(1L);
             System.out.println(book);
-
-
         }
     }
-
 
     private static Book getBook(long isbn, String name, String author, Set<String> categories) {
         Book book = new Book();

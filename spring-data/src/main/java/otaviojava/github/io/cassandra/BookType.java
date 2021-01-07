@@ -1,7 +1,6 @@
 package otaviojava.github.io.cassandra;
 
 
-import com.datastax.driver.core.DataType;
 import org.springframework.data.cassandra.core.mapping.CassandraType;
 import org.springframework.data.cassandra.core.mapping.UserDefinedType;
 
@@ -11,16 +10,16 @@ import java.util.Set;
 @UserDefinedType("book")
 public class BookType {
 
-    @CassandraType(type = DataType.Name.BIGINT)
+    @CassandraType(type = CassandraType.Name.BIGINT)
     private Long isbn;
 
-    @CassandraType(type = DataType.Name.TEXT)
+    @CassandraType(type = CassandraType.Name.TEXT)
     private String name;
 
-    @CassandraType(type = DataType.Name.TEXT)
+    @CassandraType(type = CassandraType.Name.TEXT)
     private String author;
 
-    @CassandraType(type = DataType.Name.SET, typeArguments = DataType.Name.TEXT)
+    @CassandraType(type = CassandraType.Name.SET, typeArguments = CassandraType.Name.TEXT)
     private Set<String> categories;
 
     public Long getIsbn() {

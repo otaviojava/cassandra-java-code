@@ -13,7 +13,7 @@ public class App4 {
 
     public static void main(String[] args) {
 
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(Config.class)) {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CassandraConfig.class)) {
 
             CassandraTemplate template = ctx.getBean(CassandraTemplate.class);
 
@@ -21,7 +21,6 @@ public class App4 {
             BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));
             BookType effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Set.of("Java", "Good practice"));
             BookType nosqlDistilled = getBook(4L, "Nosql Distilled", "Martin Fowler", Set.of("NoSQL", "Good practice"));
-
 
             Category java = getCategory("Java", Set.of(cleanCode, effectiveJava));
             Category oo = getCategory("OO", Set.of(cleanCode, effectiveJava, cleanArchitecture));

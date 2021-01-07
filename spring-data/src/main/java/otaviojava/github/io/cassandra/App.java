@@ -16,7 +16,7 @@ public class App {
 
     public static void main(String[] args) {
 
-        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(Config.class)) {
+        try (AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(CassandraConfig.class)) {
 
             CassandraTemplate template = ctx.getBean(CassandraTemplate.class);
 
