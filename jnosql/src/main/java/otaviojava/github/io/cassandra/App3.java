@@ -1,7 +1,7 @@
 package otaviojava.github.io.cassandra;
 
 import jakarta.nosql.column.ColumnQuery;
-import org.eclipse.jnosql.artemis.cassandra.column.CassandraTemplate;
+import org.eclipse.jnosql.mapping.cassandra.column.CassandraTemplate;
 
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.se.SeContainerInitializer;
@@ -25,7 +25,6 @@ public class App3 {
             BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));
             BookType effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Set.of("Java", "Good practice"));
             BookType nosqlDistilled = getBook(4L, "Nosql Distilled", "Martin Fowler", Set.of("NoSQL", "Good practice"));
-
 
             Category java = getCategory("Java", Set.of(cleanCode, effectiveJava));
             Category oo = getCategory("OO", Set.of(cleanCode, effectiveJava, cleanArchitecture));

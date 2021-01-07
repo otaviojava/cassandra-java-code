@@ -1,11 +1,10 @@
 package otaviojava.github.io.cassandra;
 
 
-
 import jakarta.nosql.mapping.Column;
 import jakarta.nosql.mapping.Entity;
 import jakarta.nosql.mapping.Id;
-import org.eclipse.jnosql.artemis.cassandra.column.UDT;
+import org.eclipse.jnosql.mapping.cassandra.column.UDT;
 
 import java.util.Objects;
 import java.util.Set;
