@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class App {
 
-    l
+    private static final String KEYSPACE = "library";
 
     public static void main(String[] args) {
         try (CqlSession session = CqlSession.builder().build()) {
