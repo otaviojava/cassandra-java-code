@@ -1,18 +1,19 @@
 package otaviojava.github.io.cassandra;
 
-import com.datastax.driver.core.BoundStatement;
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.PreparedStatement;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.google.common.collect.Sets;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.BoundStatement;
+import com.datastax.oss.driver.api.core.cql.PreparedStatement;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.relation.Relation;
+import com.datastax.oss.driver.api.querybuilder.term.Term;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+
+import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal;
 
 /**
  * Hello world!
@@ -21,23 +22,25 @@ public class App2 {
 
     private static final String KEYSPACE = "library";
     private static final String COLUMN_FAMILY = "book";
-    private static final String[] NAMES = new String[]{"isbn", "name", "author", "categories"};
 
     public static void main(String[] args) {
-        try (Cluster cluster = Cluster.builder().addContactPoint("127.0.0.1").build()) {
+        try (CqlSession session = CqlSession.builder().build()) {
 
-            Session session = cluster.connect();
+            Map<String, Term> cleanCode = createInsertQuery(new Object[]{1, "Clean Code", "Robert Cecil Martin",
+                    Set.of("Java", "OO")});
+            Map<String, Term> cleanArchitecture = createInsertQuery(new Object[]{2, "Clean Architecture",
+                    "Robert Cecil Martin",
+                    Set.of("Good practice")});
+            Map<String, Term> effectiveJava = createInsertQuery(new Object[]{3, "Effective Java", "Joshua Bloch",
+                    Set.of("Java", "Good practice")});
+            Map<String, Term> nosql = createInsertQuery(new Object[]{4, "Nosql Distilled", "Martin Fowler",
+                    Set.of("NoSQL", "Good practice")});
 
-            Object[] cleanCode = new Object[]{1, "Clean Code", "Robert Cecil Martin", Sets.newHashSet("Java", "OO")};
-            Object[] cleanArchitecture = new Object[]{2, "Clean Architecture", "Robert Cecil Martin", Sets.newHashSet("Good practice")};
-            Object[] effectiveJava = new Object[]{3, "Effective Java", "Joshua Bloch", Sets.newHashSet("Java", "Good practice")};
-            Object[] nosql = new Object[]{4, "Nosql Distilled", "Martin Fowler", Sets.newHashSet("NoSQL", "Good practice")};
-
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, cleanCode));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, cleanArchitecture));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, effectiveJava));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, nosql));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, cleanCode));
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(cleanCode).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(cleanArchitecture).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(effectiveJava).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(nosql).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(cleanCode).build());
 
             Consumer<Row> log = row -> {
                 Long isbn = row.getLong("isbn");
@@ -56,20 +59,27 @@ public class App2 {
             ResultSet resultSet = session.execute(statement);
             resultSet.forEach(log);
 
-
         }
 
+    }
+
+    private static void deleteById(CqlSession session, Long isbn) {
+        session.execute(QueryBuilder.deleteFrom(KEYSPACE, COLUMN_FAMILY)
+                .where(Relation.column("isbn").isEqualTo(QueryBuilder.literal(isbn))).build());
 
     }
 
-    private static void deleteById(Session session, Long isbn) {
-        session.execute(QueryBuilder.delete().from(KEYSPACE, COLUMN_FAMILY).where(QueryBuilder.eq("isbn", isbn)));
-
-    }
-
-    private static void findById(Session session, long isbn, Consumer<Row> log) {
-        ResultSet resultSet = session.execute(QueryBuilder.select().from(KEYSPACE, COLUMN_FAMILY).where(QueryBuilder.eq("isbn", isbn)));
+    private static void findById(CqlSession session, long isbn, Consumer<Row> log) {
+        ResultSet resultSet = session.execute(QueryBuilder.selectFrom(KEYSPACE, COLUMN_FAMILY)
+                .all().where(Relation.column("isbn").isEqualTo(QueryBuilder.literal(isbn))).build());
         resultSet.forEach(log);
+    }
+
+    private static Map<String, Term> createInsertQuery(Object[] parameters) {
+        return Map.of("isbn", literal(parameters[0]), "name", literal(parameters[1]),
+                "author", literal(parameters[2]),
+                "categories", literal(parameters[3]));
+
     }
 
 }

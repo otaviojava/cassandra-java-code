@@ -1,16 +1,13 @@
 package otaviojava.github.io.cassandra;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.CodecRegistry;
-import com.datastax.driver.core.DataType;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.TypeCodec;
-import com.datastax.driver.core.UDTValue;
-import com.datastax.driver.core.UserType;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.google.common.collect.Sets;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.core.data.UdtValue;
+import com.datastax.oss.driver.api.core.type.UserDefinedType;
+import com.datastax.oss.driver.api.core.type.codec.TypeCodec;
+import com.datastax.oss.driver.api.core.type.codec.registry.CodecRegistry;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,32 +23,35 @@ public class App3 {
     private static final String[] NAMES = new String[]{"name", "books"};
 
     public static void main(String[] args) {
-        try (Cluster cluster = Cluster.builder().addContactPoint("127.0.0.1").build()) {
+        try (CqlSession session = CqlSession.builder().build()) {
 
-            Session session = cluster.connect();
+            UserDefinedType userType =
+                    session.getMetadata()
+                            .getKeyspace(KEYSPACE)
+                            .flatMap(ks -> ks.getUserDefinedType(TYPE))
+                            .orElseThrow(() -> new IllegalArgumentException("Missing UDT definition"));
 
-            UserType userType = session.getCluster().getMetadata().getKeyspace(KEYSPACE).getUserType(TYPE);
-            UDTValue cleanCode = getValue(userType, 1, "Clean Code", "Robert Cecil Martin", Sets.newHashSet("Java", "OO", "Good practice", "Design"));
-            UDTValue cleanArchitecture = getValue(userType, 2, "Clean Architecture", "Robert Cecil Martin", Sets.newHashSet("OO", "Good practice"));
-            UDTValue effectiveJava = getValue(userType, 3, "Effective Java", "Joshua Bloch", Sets.newHashSet("Java", "OO", "Good practice"));
-            UDTValue nosql = getValue(userType, 4, "Nosql Distilled", "Martin Fowler", Sets.newHashSet("NoSQL", "Good practice"));
+            UdtValue cleanCode = getValue(userType, 1, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO", "Good practice", "Design"));
+            UdtValue cleanArchitecture = getValue(userType, 2, "Clean Architecture", "Robert Cecil Martin", Set.of("OO", "Good practice"));
+            UdtValue effectiveJava = getValue(userType, 3, "Effective Java", "Joshua Bloch", Set.of("Java", "OO", "Good practice"));
+            UdtValue nosql = getValue(userType, 4, "Nosql Distilled", "Martin Fowler", Set.of("NoSQL", "Good practice"));
 
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"Java", Sets.newHashSet(cleanCode, effectiveJava)}));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"OO", Sets.newHashSet(cleanCode, effectiveJava, cleanArchitecture)}));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"Good practice", Sets.newHashSet(cleanCode, effectiveJava, cleanArchitecture, nosql)}));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"NoSQL", Sets.newHashSet(nosql)}));
+//            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"Java", Set.of(cleanCode, effectiveJava)}));
+//            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"OO", Set.of(cleanCode, effectiveJava, cleanArchitecture)}));
+//            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"Good practice", Set.of(cleanCode, effectiveJava, cleanArchitecture, nosql)}));
+//            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, new Object[]{"NoSQL", Set.of(nosql)}));
 
-            ResultSet resultSet = session.execute(QueryBuilder.select().from(KEYSPACE, COLUMN_FAMILY));
+            ResultSet resultSet = session.execute(QueryBuilder.selectFrom(KEYSPACE, COLUMN_FAMILY).all().build());
             for (Row row : resultSet) {
                 String name = row.getString("name");
-                Set<UDTValue> books = row.getSet("books", UDTValue.class);
+                UdtValue books = row.getUdtValue("books");
                 Set<String> logBooks = new HashSet<>();
-                for (UDTValue book : books) {
-                    long isbn = book.getLong("isbn");
-                    String bookName = book.getString("name");
-                    String author = book.getString("author");
-                    logBooks.add(String.format(" %d %s %s", isbn, bookName, author));
-                }
+//                for (UserDefinedType book : books) {
+//                    long isbn = book.getLong("isbn");
+//                    String bookName = book.getString("name");
+//                    String author = book.getString("author");
+//                    logBooks.add(String.format(" %d %s %s", isbn, bookName, author));
+//                }
                 System.out.println(String.format("The result %s %s", name, logBooks));
 
             }
@@ -59,11 +59,12 @@ public class App3 {
 
     }
 
-    private static UDTValue getValue(UserType userType, long isbn, String name, String author, Set<String> categories) {
-        UDTValue udtValue = userType.newValue();
-        TypeCodec<Object> textCodec = CodecRegistry.DEFAULT_INSTANCE.codecFor(DataType.text());
-        TypeCodec<Object> setCodec = CodecRegistry.DEFAULT_INSTANCE.codecFor(DataType.set(DataType.text()));
-        TypeCodec<Object> bigIntCodec = CodecRegistry.DEFAULT_INSTANCE.codecFor(DataType.bigint());
+    private static UdtValue getValue(UserDefinedType userType, long isbn, String name, String author, Set<String> categories) {
+        UdtValue udtValue = userType.newValue();
+
+        TypeCodec<Object> textCodec = CodecRegistry.DEFAULT.codecFor(userType.getFieldTypes().get(1));
+        TypeCodec<Object> setCodec = CodecRegistry.DEFAULT.codecFor(userType.getFieldTypes().get(2));
+        TypeCodec<Object> bigIntCodec = CodecRegistry.DEFAULT.codecFor(userType.getFieldTypes().get(3));
         udtValue.set("isbn", isbn, bigIntCodec);
         udtValue.set("name", name, textCodec);
         udtValue.set("author", author, textCodec);

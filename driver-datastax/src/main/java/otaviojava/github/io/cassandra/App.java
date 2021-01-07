@@ -23,9 +23,10 @@ public class App {
     public static void main(String[] args) {
         try (CqlSession session = CqlSession.builder().build()) {
 
-
-            Map<String, Term> cleanCode = createInsertQuery(new Object[]{1, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO")});
-            Map<String, Term> cleanArchitecture = createInsertQuery(new Object[]{2, "Clean Architecture", "Robert Cecil Martin",
+            Map<String, Term> cleanCode = createInsertQuery(new Object[]{1, "Clean Code", "Robert Cecil Martin",
+                    Set.of("Java", "OO")});
+            Map<String, Term> cleanArchitecture = createInsertQuery(new Object[]{2, "Clean Architecture",
+                    "Robert Cecil Martin",
                     Set.of("Good practice")});
             Map<String, Term> effectiveJava = createInsertQuery(new Object[]{3, "Effective Java", "Joshua Bloch",
                     Set.of("Java", "Good practice")});
