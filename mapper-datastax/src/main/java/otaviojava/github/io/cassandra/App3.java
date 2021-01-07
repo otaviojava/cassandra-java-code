@@ -1,13 +1,9 @@
 package otaviojava.github.io.cassandra;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.datastax.driver.mapping.Mapper;
-import com.datastax.driver.mapping.MappingManager;
-import com.datastax.driver.mapping.Result;
-import com.google.common.collect.Sets;
+import com.datastax.oss.driver.api.core.CqlIdentifier;
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.PagingIterable;
+import com.datastax.oss.driver.shaded.guava.common.collect.Sets;
 
 import java.util.Set;
 import java.util.stream.StreamSupport;
@@ -18,20 +14,17 @@ import java.util.stream.StreamSupport;
 public class App3 {
 
     private static final String KEYSPACE = "library";
-    private static final String COLUMN_FAMILY = "category";
 
     public static void main(String[] args) {
-        try (Cluster cluster = Cluster.builder().addContactPoint("127.0.0.1").build()) {
+        try (CqlSession session = CqlSession.builder().build()) {
 
-            Session session = cluster.connect();
-            MappingManager manager = new MappingManager(session);
-            Mapper<Category> mapper = manager.mapper(Category.class);
+            InventoryMapper inventoryMapper = new InventoryMapperBuilder(session).build();
+            CategoryDao mapper = inventoryMapper.getCategory(CqlIdentifier.fromCql(KEYSPACE));
 
-            BookType cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Sets.newHashSet("Java", "OO"));
-            BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Sets.newHashSet("Good practice"));
-            BookType effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Sets.newHashSet("Java", "Good practice"));
-            BookType nosqlDistilled = getBook(4L, "Nosql Distilled", "Martin Fowler", Sets.newHashSet("NoSQL", "Good practice"));
-
+            BookType cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO"));
+            BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));
+            BookType effectiveJava = getBook(3L, "Effective Java", "Joshua Bloch", Set.of("Java", "Good practice"));
+            BookType nosqlDistilled = getBook(4L, "Nosql Distilled", "Martin Fowler", Set.of("NoSQL", "Good practice"));
 
             Category java = getCategory("Java", Sets.newHashSet(cleanCode, effectiveJava));
             Category oo = getCategory("OO", Sets.newHashSet(cleanCode, effectiveJava, cleanArchitecture));
@@ -43,8 +36,7 @@ public class App3 {
             mapper.save(goodPractice);
             mapper.save(nosql);
 
-            ResultSet resultSet = session.execute(QueryBuilder.select().from(KEYSPACE, COLUMN_FAMILY));
-            Result<Category> categories = mapper.map(resultSet);
+            PagingIterable<Category> categories = mapper.map();
             StreamSupport.stream(categories.spliterator(), false).forEach(System.out::println);
         }
 

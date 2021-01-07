@@ -9,4 +9,7 @@ import com.datastax.oss.driver.api.mapper.annotations.Mapper;
 public interface InventoryMapper {
     @DaoFactory
     BookDao productDao(@DaoKeyspace CqlIdentifier keyspace);
+
+    @DaoFactory
+    CategoryDao getCategory(@DaoKeyspace CqlIdentifier keyspace);
 }
