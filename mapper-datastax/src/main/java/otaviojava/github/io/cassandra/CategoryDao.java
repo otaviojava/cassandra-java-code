@@ -21,4 +21,5 @@ public interface CategoryDao {
 
     @Query("SELECT * FROM library.category")
     PagingIterable<Category> map();
+
 }

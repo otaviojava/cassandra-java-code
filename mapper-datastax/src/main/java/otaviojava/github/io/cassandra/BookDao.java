@@ -9,6 +9,7 @@ import com.datastax.oss.driver.api.mapper.annotations.Query;
 import com.datastax.oss.driver.api.mapper.annotations.Select;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Dao
 public interface BookDao {
@@ -24,4 +25,10 @@ public interface BookDao {
 
     @Query("SELECT * FROM library.book")
     PagingIterable<Book> map();
+
+    @Insert
+    CompletableFuture<Book> saveAsync(Book book);
+
+    @Select
+    CompletableFuture<Book> findByIdAsync(Long id);
 }
