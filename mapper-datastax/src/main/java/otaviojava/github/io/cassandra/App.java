@@ -10,8 +10,7 @@ import java.util.Set;
  */
 public class App {
 
-    private static final String KEYSPACE = "library";
-    private static final String COLUMN_FAMILY = "book";
+    l
 
     public static void main(String[] args) {
         try (CqlSession session = CqlSession.builder().build()) {
