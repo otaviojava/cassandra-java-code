@@ -28,12 +28,10 @@ public class App2 {
             mapper.save(effectiveJava);
             mapper.save(nosql);
 
-
             Book book = mapper.findById(1L);
             System.out.println("Book found: " + book);
 
             mapper.delete(book);
-
             System.out.println("Book found: " + mapper.findById(1L));
 
         }
