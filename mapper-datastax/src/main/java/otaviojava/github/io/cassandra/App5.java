@@ -2,7 +2,6 @@ package otaviojava.github.io.cassandra;
 
 import com.datastax.oss.driver.api.core.CqlIdentifier;
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.PagingIterable;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +18,7 @@ public class App5 {
         try (CqlSession session = CqlSession.builder().build()) {
 
             InventoryMapper inventoryMapper = new InventoryMapperBuilder(session).build();
-            BookDao mapper = inventoryMapper.productDao(CqlIdentifier.fromCql(KEYSPACE));
+            BookDao mapper = inventoryMapper.getBookDao(CqlIdentifier.fromCql(KEYSPACE));
 
             Book cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO"));
             Book cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));

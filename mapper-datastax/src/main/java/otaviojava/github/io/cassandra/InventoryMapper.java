@@ -8,8 +8,8 @@ import com.datastax.oss.driver.api.mapper.annotations.Mapper;
 @Mapper
 public interface InventoryMapper {
     @DaoFactory
-    BookDao productDao(@DaoKeyspace CqlIdentifier keyspace);
+    BookDao getBookDao(@DaoKeyspace CqlIdentifier keyspace);
 
     @DaoFactory
-    CategoryDao getCategory(@DaoKeyspace CqlIdentifier keyspace);
+    CategoryDao getCategoryDao(@DaoKeyspace CqlIdentifier keyspace);
 }

@@ -19,7 +19,7 @@ public class App3 {
         try (CqlSession session = CqlSession.builder().build()) {
 
             InventoryMapper inventoryMapper = new InventoryMapperBuilder(session).build();
-            CategoryDao mapper = inventoryMapper.getCategory(CqlIdentifier.fromCql(KEYSPACE));
+            CategoryDao mapper = inventoryMapper.getCategoryDao(CqlIdentifier.fromCql(KEYSPACE));
 
             BookType cleanCode = getBook(1L, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO"));
             BookType cleanArchitecture = getBook(2L, "Clean Architecture", "Robert Cecil Martin", Set.of("Good practice"));
