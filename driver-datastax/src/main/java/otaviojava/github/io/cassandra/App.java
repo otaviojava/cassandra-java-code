@@ -1,13 +1,16 @@
 package otaviojava.github.io.cassandra;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.google.common.collect.Sets;
 
+import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.cql.ResultSet;
+import com.datastax.oss.driver.api.core.cql.Row;
+import com.datastax.oss.driver.api.querybuilder.QueryBuilder;
+import com.datastax.oss.driver.api.querybuilder.term.Term;
+
+import java.util.Map;
 import java.util.Set;
+
+import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal;
 
 /**
  * Hello world!
@@ -16,25 +19,26 @@ public class App {
 
     private static final String KEYSPACE = "library";
     private static final String COLUMN_FAMILY = "book";
-    private static final String[] NAMES = new String[]{"isbn", "name", "author", "categories"};
 
     public static void main(String[] args) {
-        try (Cluster cluster = Cluster.builder().addContactPoint("127.0.0.1").build()) {
+        try (CqlSession session = CqlSession.builder().build()) {
 
-            Session session = cluster.connect();
 
-            Object[] cleanCode = new Object[]{1, "Clean Code", "Robert Cecil Martin", Sets.newHashSet("Java", "OO")};
-            Object[] cleanArchitecture = new Object[]{2, "Clean Architecture", "Robert Cecil Martin", Sets.newHashSet("Good practice")};
-            Object[] effectiveJava = new Object[]{3, "Effective Java", "Joshua Bloch", Sets.newHashSet("Java", "Good practice")};
-            Object[] nosql = new Object[]{4, "Nosql Distilled", "Martin Fowler", Sets.newHashSet("NoSQL", "Good practice")};
+            Map<String, Term> cleanCode = createInsertQuery(new Object[]{1, "Clean Code", "Robert Cecil Martin", Set.of("Java", "OO")});
+            Map<String, Term> cleanArchitecture = createInsertQuery(new Object[]{2, "Clean Architecture", "Robert Cecil Martin",
+                    Set.of("Good practice")});
+            Map<String, Term> effectiveJava = createInsertQuery(new Object[]{3, "Effective Java", "Joshua Bloch",
+                    Set.of("Java", "Good practice")});
+            Map<String, Term> nosql = createInsertQuery(new Object[]{4, "Nosql Distilled", "Martin Fowler",
+                    Set.of("NoSQL", "Good practice")});
 
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, cleanCode));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, cleanArchitecture));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, effectiveJava));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, nosql));
-            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(NAMES, cleanCode));
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(cleanCode).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(cleanArchitecture).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(effectiveJava).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(nosql).build());
+            session.execute(QueryBuilder.insertInto(KEYSPACE, COLUMN_FAMILY).values(cleanCode).build());
 
-            ResultSet resultSet = session.execute(QueryBuilder.select().from(KEYSPACE, COLUMN_FAMILY));
+            ResultSet resultSet = session.execute(QueryBuilder.selectFrom(KEYSPACE, COLUMN_FAMILY).all().build());
             for (Row row : resultSet) {
                 Long isbn = row.getLong("isbn");
                 String name = row.getString("name");
@@ -43,6 +47,13 @@ public class App {
                 System.out.println(String.format(" the result is %s %s %s %s", isbn, name, author, categories));
             }
         }
+
+    }
+
+    private static Map<String, Term>  createInsertQuery(Object[] parameters) {
+        return Map.of("isbn", literal(parameters[0]), "name", literal(parameters[1]),
+                "author", literal(parameters[2]),
+                "categories", literal(parameters[3]));
 
     }
 
