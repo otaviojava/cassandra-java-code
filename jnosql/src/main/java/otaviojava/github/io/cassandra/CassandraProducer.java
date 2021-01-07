@@ -1,7 +1,6 @@
 package otaviojava.github.io.cassandra;
 
 import jakarta.nosql.column.ColumnFamilyManager;
-import org.eclipse.jnosql.diana.cassandra.column.CassandraColumnFamilyManager;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -18,11 +17,11 @@ public class CassandraProducer {
 
     @Produces
     @ApplicationScoped
-    public CassandraColumnFamilyManager getManagerCassandra() {
-        return (CassandraColumnFamilyManager) manager;
+    public ColumnFamilyManager getManagerCassandra() {
+        return manager;
     }
 
-    public void dispose(@Disposes CassandraColumnFamilyManager manager) {
+    public void dispose(@Disposes ColumnFamilyManager manager) {
         manager.close();
     }
 
